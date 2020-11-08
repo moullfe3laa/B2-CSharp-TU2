@@ -8,21 +8,23 @@ using System.Text;
 using System.Text.Json;
 
 namespace ProjetPourTU.Services {
-    public class VehiculeService {
+    public  class  VehiculeService {
 
         private List<Vehicule> _mesVehicules;
 
-        private const string jsonFile = "//cheminreseauinconnu/myFile.json";
+        // Avec cette ligne il me donne un erreur a propos de chemin 
+        //  private const string jsonFile = "//cheminreseauinconnu/myFile.json";
+
+        private const string jsonFile = "/myFile.json";
         /// <summary>
         /// Constructeur => pour plus de simplicité, j'initialise 3 véhicules dans le service
         /// </summary>
-        public VehiculeService() {
-            
+
+        public VehiculeService()
+        {
+
         }
-
-
-
-        public List<Vehicule> getAll() {
+        public virtual  List<Vehicule> getAll() {
             if (_mesVehicules == null) {
                 if (!File.Exists(jsonFile)){
                     _mesVehicules = new List<Vehicule>();
@@ -49,10 +51,10 @@ namespace ProjetPourTU.Services {
         /// </summary>
         /// <param name="VehiculeID"></param>
         /// <returns></returns>
-        public Vehicule getByID(int VehiculeID) {
+        public virtual Vehicule getByID(int VehiculeID) {
             if (VehiculeID <= 0)
                 throw new InvalidIDException();
-            Vehicule result = searchByID(VehiculeID);
+            Vehicule result = SearchByID(VehiculeID);
             if (result == null)
                 throw new VehiculeNotFoundException();
             return result;
@@ -64,12 +66,13 @@ namespace ProjetPourTU.Services {
         /// Vérifie si un même véhicule existe avec l'ID, dans ce cas, on lève une exception
         /// </summary>
         /// <param name="nouveauVehicule"></param>
-        public void AddVehicule(Vehicule nouveauVehicule) {
+        public virtual void AddVehicule(Vehicule nouveauVehicule) {
             if (nouveauVehicule == null)
                 throw new NullNotAllowedException();
-            Vehicule memeVehiculeParID = searchByID(nouveauVehicule.ID);
+            Vehicule memeVehiculeParID = SearchByID(nouveauVehicule.ID);
             if (memeVehiculeParID != null)
-                throw new SameIDExistsException();
+            { throw new SameIDExistsException();          
+            }            
             // création d'un nouvel ID
             int maxID = 1;
             List<Vehicule> vehicules = getAll();
@@ -90,7 +93,7 @@ namespace ProjetPourTU.Services {
         /// </summary>
         /// <param name="v"></param>
         /// <returns></returns>
-        public string CreerMessagePourUnVehicule(Vehicule v) {
+        public virtual string CreerMessagePourUnVehicule(Vehicule v) {
             return "Véhicule : " + v.Nom + ", immatriculation : " + v.Immatriculation;
         }
 
@@ -98,7 +101,7 @@ namespace ProjetPourTU.Services {
         /// <summary>
         /// Création d'un message pour l'ensemble des véhicules de la bd
         /// </summary>
-        public string CreerMessage() {
+        public virtual string CreerMessage() {
             // ne cherchez pas à comprendre cette ligne, je vous l'expliquerai ultérieurement
             // vous devez simplement produire le test correspondant à cette méthode (qui fonctionne correctement)
             return string.Join("\n",getAll().Select(v => CreerMessagePourUnVehicule(v)));
@@ -108,7 +111,7 @@ namespace ProjetPourTU.Services {
         /// </summary>
         /// <param name="VehiculeID"></param>
         /// <returns></returns>
-        private Vehicule searchByID(int VehiculeID) {
+        private Vehicule SearchByID(int VehiculeID){
             Vehicule result = null;
             // parcours des véhicules pour en trouver un avec le même ID
             foreach (Vehicule v in getAll()) {
